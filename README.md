@@ -3,7 +3,23 @@
 
 ## 介绍
 docker-downloader是一个用于下载docker镜像的工具。
-这里通过dockerhub的api
+这里通过dockerhub的api拉去docker镜像的layer和config，本地打包成tar
+
+
+## 快速开始
+
+输入镜像的完整名称，例如：hello-world，输入tagName，比如latest，然后点下载，等待下载完成。
+
+拿到docker镜像的tar文件，就可以直接使用docker load命令导入到本地。
+
+```shell
+# Load images from STDIN
+docker load < busybox.tar.gz
+
+# Load images from a file (--input)
+docker load --input busybox.tar.gz
+```
+
 
 
 
