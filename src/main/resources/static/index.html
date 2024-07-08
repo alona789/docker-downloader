@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Title</title>
+    <meta charset="utf-8"/>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- 会使用最新版本，你最好指定一个版本 -->
+    <script src="https://unpkg.com/naive-ui@2.38.2/dist/index.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <n-space justify="center">
+        <n-input-group>
+            <n-input v-model:style="{ width: '50%' }"
+                     type="text"
+                     placeholder="请输入镜像名称"
+                     :autosize="{minRows:10}"
+                     v-model:value="imageForm.imageName">
+            </n-input>
+            <n-input-group-label>:</n-input-group-label>
+            <n-input v-model:style="{ width: '50%' }"
+                     type="text"
+                     placeholder="请输入标签名称"
+                     :autosize="{minRows:10}"
+                     v-model:value="imageForm.tagName">
+            </n-input>
+        </n-input-group>
+        <n-button attr-type="button" @click="download">下载</n-button>
+    </n-space>
+</div>
+<script>
+    const App = {
+        setup() {
+            const imageForm = Vue.reactive({
+                imageName: 'hello-world',
+                tagName: 'latest',
+            })
+
+            // Vue.watch(this.imageForm.imageName, async (newImageValue, oldImageValue) => {
+            //     if (newImageValue.includes(':')) {
+            //         const arr = newImageValue.split(':')
+            //         this.imageForm.imageName = arr[0]
+            //         this.imageForm.tagName = arr[1]
+            //     }
+            // })
+            return {
+                message: Vue.reactive('Hello Vue 3!'),
+                imageForm,
+                formRef: Vue.ref(null),
+                download() {
+                    axios.get('/docker/pull', {
+                        params: {
+                            ...imageForm,
+                        },
+                        responseType: 'blob'
+                    }).then((res) => {
+                        //// 从响应头中获取文件名
+                        // const contentDisposition = res.headers['content-disposition'];
+                        // let fileName = 'default_filename.tar'; // 默认文件名
+                        //
+                        // if (contentDisposition && contentDisposition.includes('filename=')) {
+                        //     // 提取文件名
+                        //     const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+                        //     if (fileNameMatch.length > 1) {
+                        //         fileName = fileNameMatch[1];
+                        //     }
+                        // }
+
+                        // 自己拼接文件名
+                        const fileName = `${imageForm.imageName}_${imageForm.tagName}.tar`;
+
+                        // 下载
+                        // 创建 Blob URL
+                        const fileURL = window.URL.createObjectURL(res.data);
+                        // 创建一个隐藏的 <a> 元素来下载文件
+                        const link = document.createElement('a');
+                        link.href = fileURL;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        // 释放 Blob URL
+                        window.URL.revokeObjectURL(fileURL);
+
+
+                        // var file = window.URL.createObjectURL(res.data);
+                        // var filename = res.headers['content-disposition'].split('filename=')[1];
+                        // console.log(filename)
+                        // window.location.assign(file);
+                    }).catch((e) => console.log(e));
+                },
+            }
+        }
+    }
+    const app = Vue.createApp(App)
+
+    app.use(naive)
+    app.mount('#app')
+</script>
+</body>
+</html>

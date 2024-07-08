@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: docker-downloader
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+forest:
+  log-response-content: true
+  connect-timeout: 30000
+  read-timeout: 30000
