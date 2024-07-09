@@ -49,9 +49,8 @@ public class TarUtil {
                 osList.add(latestOs);
             }
         } catch (IOException e) {
-            for (OutputStream outputStream : osList) {
-                IOUtils.closeQuietly(outputStream);
-            }
+            IOUtils.closeQuietly(osList.toArray(new OutputStream[]{}));
+            throw e;
         }
 
         try (TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(latestOs)) {
@@ -96,15 +95,14 @@ public class TarUtil {
 
             tarArchiveOutputStream.finish();
         } finally {
-            for (OutputStream outputStream : osList) {
-                IOUtils.closeQuietly(outputStream);
-            }
+            IOUtils.closeQuietly(osList.toArray(new OutputStream[]{}));
         }
     }
 
 
     /**
      * 来自 stackoverflow
+     *
      * @param source
      * @throws IOException
      * @see <a href="https://stackoverflow.com/a/63396272/24178212">stackoverflow</a>
@@ -168,7 +166,8 @@ public class TarUtil {
 
 
     public static void decompressGzipFile(String gzipFile, String newFile) throws IOException {
-        try (GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(gzipFile));
+        try (FileInputStream in = new FileInputStream(gzipFile);
+             GZIPInputStream gzip = new GZIPInputStream(in);
              FileOutputStream out = new FileOutputStream(newFile)) {
             IOUtils.copy(gzip, out);
         }

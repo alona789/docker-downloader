@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * docker controller
@@ -34,7 +33,7 @@ public class DockerController {
         PathResource resource = new PathResource(path);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
-        responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", URLEncoder.encode(path.getFileName().toString(), "UTF-8")));
+        responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", URLEncoder.encode(path.getFileName().toString(), StandardCharsets.UTF_8)));
 
         return ResponseEntity.ok()
                 .headers(responseHeaders)
